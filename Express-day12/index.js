@@ -6,6 +6,13 @@ const hbs = require("hbs");
 const app = express();
 const port = 3000;
 
+// konfigurasi yang berfungsi sebagai middleware dan view engine setup
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "hbs");
+app.set("views", path.join(__dirname, "views"));
+
 // memanggil database
 const pool = new Pool({
   user: "postgres",
@@ -15,12 +22,24 @@ const pool = new Pool({
   port: 5432
 });
 
-// konfigurasi yang berfungsi sebagai middleware dan view engine setup
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
-app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "views"));
+// Route Tambah Project
+app.post("/add-project", (req, res) => {
+  const { name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4 } = req.body;
+
+  pool.query(`
+    INSERT INTO projects (name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+  `, [name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4],
+    (err) => {
+      if (err) {
+        console.error("Error tambah project:", err);
+        return res.status(500).send("Gagal menambahkan project");
+      }
+
+      res.redirect("/");
+    }
+  );
+});
 
 // Format tanggal untuk input form
 function formatDateToInput(date) {
@@ -38,6 +57,29 @@ hbs.registerHelper("formatDate", function (date) {
     year: "numeric"
   });
 });
+
+// Route Edit Project
+app.post("/edit-project/:id", (req, res) => {
+  const id = req.params.id;
+  const { name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4 } = req.body;
+
+  pool.query(`
+    UPDATE projects
+    SET name = $1, startDate = $2, endDate = $3, deskripsi = $4,
+        techno1 = $5, techno2 = $6, techno3 = $7, techno4 = $8
+    WHERE id = $9
+  `, [name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4, id],
+    (err) => {
+      if (err) {
+        console.error("Error edit project:", err);
+        return res.status(500).send("Gagal mengedit project");
+      }
+
+      res.redirect("/");
+    }
+  );
+});
+
 
 // Route home
 app.get("/", (req, res) => {
@@ -86,46 +128,6 @@ app.get("/", (req, res) => {
   }
 });
 
-// Route Tambah Project
-app.post("/add-project", (req, res) => {
-  const { name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4 } = req.body;
-
-  pool.query(`
-    INSERT INTO projects (name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  `, [name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4],
-    (err) => {
-      if (err) {
-        console.error("Error tambah project:", err);
-        return res.status(500).send("Gagal menambahkan project");
-      }
-
-      res.redirect("/");
-    }
-  );
-});
-
-// Route Edit Project
-app.post("/edit-project/:id", (req, res) => {
-  const id = req.params.id;
-  const { name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4 } = req.body;
-
-  pool.query(`
-    UPDATE projects
-    SET name = $1, startDate = $2, endDate = $3, deskripsi = $4,
-        techno1 = $5, techno2 = $6, techno3 = $7, techno4 = $8
-    WHERE id = $9
-  `, [name, startDate, endDate, deskripsi, techno1, techno2, techno3, techno4, id],
-    (err) => {
-      if (err) {
-        console.error("Error edit project:", err);
-        return res.status(500).send("Gagal mengedit project");
-      }
-
-      res.redirect("/");
-    }
-  );
-});
 
 // Route Hapus Project
 app.post("/delete-project/:id", (req, res) => {
