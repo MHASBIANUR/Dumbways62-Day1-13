@@ -42,9 +42,7 @@
     </nav>
 
 
-
-    <form action="{{#if project}}/edit-project/{{project.id}}{{else}}/add-project{{/if}}" method="POST"
-        enctype="multipart/form-data">
+    <form action="{{#if project}}/edit-project/{{project.id}}{{else}}/add-project{{/if}}" method="POST">
         <div class="container" style="width: 600px;">
             <h1 style="text-align: center; font-size: 25px; font-weight: bold;">ADD MY PROJECT</h1>
             <br>
@@ -112,8 +110,6 @@
                     project}}Update{{else}}Submit{{/if}}</button>
             </div>
 
-
-
         </div>
     </form>
     <br>
@@ -126,7 +122,7 @@
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px;">
             {{#each projects}}
             <div class="project-card"
-                style="border: 1px solid #ccc; padding: 16px; border-radius: 8px; width: 300px; background: #f9f9f9; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                style="font-size: 10px;; border: 1px solid #ccc; padding: 16px; border-radius: 8px; width: 300px; background: #f9f9f9; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                 <h3>{{this.name}}</h3>
                 <p>Start Date: {{formatDate this.startdate}}</p>
                 <p>End Date: {{formatDate this.enddate}}</p>
